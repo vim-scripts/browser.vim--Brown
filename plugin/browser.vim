@@ -85,6 +85,7 @@
 "au FileType python map K :GooglePythonDoc <cword><cr>
 
 com! -nargs=+ Wikipedia       call OpenWikipedia(<q-args>)
+com! -nargs=+ Dictionary      call OpenDictionary(<q-args>)
 com! -nargs=+ WebBrowser      call OpenWebBrowser(<q-args>)
 com! -nargs=+ GoogleLucky     call OpenGoogle(<q-args>, 1, '')
 com! -nargs=+ Google          call OpenGoogle(<q-args>, 0 , '')
@@ -97,6 +98,7 @@ fun! OpenWebBrowser (address)
     exe "set buftype=nofile"
     exe "silent r!lynx -dump " . a:address
     syn reset
+    "add some syntax rules (thanks to jamesson on #vim)
     syn match Keyword /\[\d*\]\w*/ contains=Ignore
     syn match Ignore /\[\d*\]/ contained 
     exe "norm gg"
@@ -107,7 +109,7 @@ endfun
 
 fun! OpenGoogle (sentence,lucky,site)
     if a:site != ''
-        let site_clause = '\&site\%3A' . a:site
+        let site_clause = '\+site\%3A' . a:site
     else
         let site_clause = ''
     endif
@@ -119,7 +121,7 @@ fun! OpenGoogle (sentence,lucky,site)
     endif
 
     let topic = substitute(a:sentence, " ", "+", "g") 
-    let address = 'http://www.google.com/search?'.type.'=yes\&q=' . topic .site_clause
+    let address = 'http://www.google.com/search\?'.type.'=yes\&q=' . topic .site_clause
     call OpenWebBrowser(address)
 endfun
 
@@ -131,6 +133,13 @@ fun! OpenWikipedia (sentence)
     exe "norm 5dd"
 endfun
 
+fun! OpenDictionary (sentence)
+    let topic = substitute(a:sentence, " ", "_", "g") 
+    "let address = 'http://www.thefreedictionary.com/' . topic
+    let address = 'http://en.wiktionary.org/wiki/' . topic
+    "echo address
+    call OpenWebBrowser(address)
+endfun
 "
 fun! OpenPhpFunction (keyword)
     "let address = 'http://www.php.net/' . a:keyword
